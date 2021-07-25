@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue - Summer camp homework 01</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Styles -->
+  <link rel="stylesheet" href="./style.css">
+  <!-- Vue -->
+  <script src="https://unpkg.com/vue@next"></script>
+  <!-- Axios -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+    integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div class="container">
+      <div class="control">
+        <button type="button" @click="handleClickButton">
+          Change avatar to {{ highResolution ? 'LOW' : 'HIGH' }} resolution
+        </button>
+        <div class="refresh" @click="getData">Refresh ⟳</div>
+      </div>
+      <main class="content">
+        <div v-for="{ name, gender, email, phone, cell, location, dob, picture } in list" class="card">
+          <div class="avatar">
+            <img v-if="highResolution" :src="picture.large" :alt="name.first + name.last">
+            <img v-else :src="picture.thumbnail" :alt="name.first + name.last">
+          </div>
+          <div class="head">
+            <div v-if="gender === 'male'" class="gender male"></div>
+            <div v-else class="gender female"></div>
+            <h3>{{ name.first }} {{ name.last }}</h3>
+          </div>
+          <div class="body">
+            <div class="contact">
+              <p>
+                <span>Email</span>
+                <a :href="`mailto: ${email}`">{{ email }}</a>
+              </p>
+              <p>
+                <span>Phone</span>
+                <a :href="`tel: ${phone}`">{{ phone }}</a>
+              </p>
+              <p>
+                <span>Cell</span>
+                <a :href="`tel: ${cell}`">{{ cell }}</a>
+              </p>
+            </div>
+            <div class="location">
+              <h3>Location</h3>
+              <p><span>State</span> {{ location.state }}</p>
+              <p><span>City</span>{{ location.city }}</p>
+              <p><span>Country</span>{{ location.country }}</p>
+              <p><span>Postcode</span>{{ location.postcode }}</p>
+              <p>
+                <span>Address</span>
+                No. {{ location.street.number }}, {{ location.street.name }}., {{
+                location.state }}., {{ location.city }} {{ location.postcode }} ({{
+                location.country }})
+              </p>
+              <p><span>Description</span>{{ location.timezone.description }}</p>
+            </div>
+            <p><span>Birth</span>{{ new Date(dob.date).toLocaleDateString() }}</p>
+            <p><span>Registered</span>{{ new Date(dob.date).toLocaleString() }}</p>
+          </div>
+          <iframe class="map" frameborder="0"
+            :src="`https://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=${location.coordinates.latitude},${location.coordinates.longitude}&z=10&output=embed`">
+          </iframe>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    Vue.createApp({
+      data() {
+        return {
+          list: [],
+          highResolution: true,
+        }
+      },
+      methods: {
+        getData() {
+          axios.get('https://randomuser.me/api/?results=10')
+            .then((response) => this.list = response.data.results)
+            .catch((error) => console.error(error))
+        },
+        handleClickButton() {
+          this.highResolution = !this.highResolution;
+        }
+      },
+      mounted() {
+        this.getData()
+      },
+    }).mount('#app');
+  </script>
+</body>
+
+</html>

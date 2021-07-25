@@ -5,15 +5,13 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vue - Summer camp homework 01</title>
+  <title>Vue - Summer camp homework 02</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;300&display=swap" rel="stylesheet">
   <!-- Styles -->
   <link rel="stylesheet" href="./style.css">
-  <!-- Vue -->
-  <script src="https://unpkg.com/vue@next"></script>
   <!-- Axios -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
     integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
@@ -22,84 +20,189 @@
 
 <body>
   <div id="app">
-    <div class="container">
-      <div class="control">
-        <button type="button" @click="handleClickButton">
-          Change avatar to {{ highResolution ? 'LOW' : 'HIGH' }} resolution
-        </button>
-        <div class="refresh" @click="getData">Refresh ⟳</div>
+    <div class="calculator">
+      <h1 class="title">Calculator</h1>
+
+      <div class="view">
+        <p class="formula">{{ data.displayFormula }}</p>
+        <p class="typing">{{ data.typing }}</p>
+        <p class="result" :class="{'hasValue': data.result}">= {{ data.result || 0 }}</p>
       </div>
-      <main class="content">
-        <div v-for="{ name, gender, email, phone, cell, location, dob, picture } in list" class="card">
-          <div class="avatar">
-            <img v-if="highResolution" :src="picture.large" :alt="name.first + name.last">
-            <img v-else :src="picture.thumbnail" :alt="name.first + name.last">
-          </div>
-          <div class="head">
-            <div v-if="gender === 'male'" class="gender male"></div>
-            <div v-else class="gender female"></div>
-            <h3>{{ name.first }} {{ name.last }}</h3>
-          </div>
-          <div class="body">
-            <div class="contact">
-              <p>
-                <span>Email</span>
-                <a :href="`mailto: ${email}`">{{ email }}</a>
-              </p>
-              <p>
-                <span>Phone</span>
-                <a :href="`tel: ${phone}`">{{ phone }}</a>
-              </p>
-              <p>
-                <span>Cell</span>
-                <a :href="`tel: ${cell}`">{{ cell }}</a>
-              </p>
-            </div>
-            <div class="location">
-              <h3>Location</h3>
-              <p><span>State</span> {{ location.state }}</p>
-              <p><span>City</span>{{ location.city }}</p>
-              <p><span>Country</span>{{ location.country }}</p>
-              <p><span>Postcode</span>{{ location.postcode }}</p>
-              <p>
-                <span>Address</span>
-                No. {{ location.street.number }}, {{ location.street.name }}., {{
-                location.state }}., {{ location.city }} {{ location.postcode }} ({{
-                location.country }})
-              </p>
-              <p><span>Description</span>{{ location.timezone.description }}</p>
-            </div>
-            <p><span>Birth</span>{{ new Date(dob.date).toLocaleDateString() }}</p>
-            <p><span>Registered</span>{{ new Date(dob.date).toLocaleString() }}</p>
-          </div>
-          <iframe class="map" frameborder="0"
-            :src="`https://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=${location.coordinates.latitude},${location.coordinates.longitude}&z=10&output=embed`">
-          </iframe>
-        </div>
-      </main>
+
+      <div class="keyboard">
+        <button @click="handleClickNumber" type="button">7</button>
+        <button @click="handleClickNumber" type="button">8</button>
+        <button @click="handleClickNumber" type="button">9</button>
+        <button @click="handleClickOperator" type="button" class="operator">+</button>
+        <button @click="handleClickNumber" type="button">4</button>
+        <button @click="handleClickNumber" type="button">5</button>
+        <button @click="handleClickNumber" type="button">6</button>
+        <button @click="handleClickOperator" type="button" class="operator">-</button>
+        <button @click="handleClickNumber" type="button">1</button>
+        <button @click="handleClickNumber" type="button">2</button>
+        <button @click="handleClickNumber" type="button">3</button>
+        <button @click="handleClickOperator" type="button" class="operator">x</button>
+        <button @click="handleClickReset" type="button" class="zeroing">C</button>
+        <button @click="handleClickNumber" type="button">0</button>
+        <button @click="handleClickEqual" type="button" class="operator">=</button>
+        <button @click="handleClickOperator" type="button" class="operator">/</button>
+      </div>
     </div>
+
+    <ul v-if="data.formulaList.length > 0" class="history">
+      <button @click="handleClickHistories" type="button">
+        <span>🗑</span>
+        Delete All
+      </button>
+      <li v-for="{ id, title } in data.formulaList" :key="id">
+        <p>{{ title }}</p>
+        <span @click="handleDeleteHistoryItem(id)">🗑</span>
+      </li>
+    </ul>
   </div>
 
-  <script>
-    Vue.createApp({
-      data() {
+  <script type="module">
+    import { createApp, reactive, watch, onMounted } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.0-beta.4/vue.esm-browser.min.js';
+
+    createApp({
+      setup() {
+        const data = reactive({
+          displayFormula: '',
+          computeFormula: null,
+          previous: '0',
+          typing: '',
+          result: '',
+          clickEqual: true,
+          clickOperator: false,
+          formulaList: [],
+        });
+
+        const setComputeFormula = (operator) => {
+          switch (operator) {
+            case '+':
+              data.computeFormula = (prev, typing) => prev + typing;
+              break;
+            case '-':
+              data.computeFormula = (prev, typing) => prev - typing;
+              break;
+            case 'x':
+              data.computeFormula = (prev, typing) => prev * typing;
+              break;
+            case '/':
+              data.computeFormula = (prev, typing) => prev / typing;
+              break;
+            default:
+              break;
+          }
+        };
+
+        const computeResult = () => {
+          let result = data.computeFormula(
+            parseFloat(data.previous, 10),
+            parseFloat(data.typing, 10),
+          );
+
+          result.toString().indexOf('.') !== -1 && (result = result.toFixed(1));
+          return result;
+        };
+
+        const handleClickNumber = (event) => {
+          if (data.clickEqual) {
+            data.result = '';
+            data.computeFormula = null;
+            data.clickEqual = false;
+          }
+          // 顯示公式
+          const value = event.target.innerText;
+          data.displayFormula += value;
+
+          // 計算邏輯
+          data.clickOperator = false;
+          data.typing += value;
+        };
+
+        const handleClickOperator = (event) => {
+          const operator = event.target.innerText;
+          if (data.clickEqual) return;
+          if (!data.clickOperator) {
+            // 顯示公式
+            data.displayFormula += ` ${operator} `;
+
+            // 計算邏輯
+            data.clickOperator = true;
+            data.computeFormula && (data.result = computeResult());
+            setComputeFormula(operator);
+            !data.result ? (data.previous = data.typing) : (data.previous = data.result);
+            data.typing = '';
+          } else {
+            // 顯示公式
+            const newDisplayFormula = data.displayFormula.split('');
+            newDisplayFormula.splice(newDisplayFormula.length - 2, 1, operator);
+            data.displayFormula = newDisplayFormula.join('');
+
+            // 計算邏輯
+            setComputeFormula(operator);
+          }
+        };
+
+        const handleClickEqual = () => {
+          if (data.clickEqual) return;
+          if (!data.computeFormula && data.typing) {
+            data.result = data.typing;
+          } else if (data.computeFormula && !data.typing) {
+            data.result = data.previous;
+          } else {
+            data.result = computeResult();
+            data.formulaList.length === 10 && data.formulaList.pop();
+            data.formulaList.unshift({
+              id: Date.now(),
+              title: `${data.displayFormula} = ${data.result}`,
+            });
+          }
+          data.clickEqual = true;
+          data.previous = '0';
+          data.typing = '';
+          data.displayFormula = '';
+        };
+
+        const handleClickReset = () => {
+          data.displayFormula = '';
+          data.computeFormula = null;
+          data.previous = '0';
+          data.typing = '';
+          data.result = '';
+          data.clickEqual = true;
+          data.clickOperator = false;
+        };
+
+        const handleClickHistories = () => {
+          data.formulaList = [];
+          handleClickReset();
+        };
+
+        const handleDeleteHistoryItem = (id) => {
+          data.formulaList = data.formulaList.filter((item) => item.id !== id);
+        };
+
+        watch(() => JSON.stringify(data.formulaList), () => {
+          localStorage.setItem('formulaList', JSON.stringify(data.formulaList));
+        });
+
+        onMounted(() => {
+          if (localStorage.getItem('formulaList')) {
+            data.formulaList = JSON.parse(localStorage.getItem('formulaList'));
+          };
+        });
+
         return {
-          list: [],
-          highResolution: true,
-        }
-      },
-      methods: {
-        getData() {
-          axios.get('https://randomuser.me/api/?results=10')
-            .then((response) => this.list = response.data.results)
-            .catch((error) => console.error(error))
-        },
-        handleClickButton() {
-          this.highResolution = !this.highResolution;
-        }
-      },
-      mounted() {
-        this.getData()
+          data,
+          handleClickNumber,
+          handleClickOperator,
+          handleClickEqual,
+          handleClickReset,
+          handleClickHistories,
+          handleDeleteHistoryItem,
+        };
       },
     }).mount('#app');
   </script>

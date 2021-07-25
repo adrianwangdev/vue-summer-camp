@@ -1,0 +1,152 @@
+:root {
+  --color-background: #F3F5FC;
+  --color-white: #FFF;
+  --color-male: #55B9E0;
+  --color-female: #FB7E78;
+  --color-link: #468cce;
+  --color-link-hover: #20609b;
+  --color-text: #2B3747;
+  --color-text-light: #707E92;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 4rem 0;
+  font-family: 'Source Sans Pro', sans-serif;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+p {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  line-height: 1.5;
+}
+
+p > span {
+  margin-right: .5rem;
+  font-weight: 700;
+}
+
+a, .control .refresh {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: all .2s;
+}
+
+a:hover, .control .refresh:hover {
+  color: var(--color-link-hover);
+}
+
+button {
+  margin-bottom: 2rem;
+  border: 0;
+  border-radius: .75rem;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  color: var(--color-white);
+  background: linear-gradient(90deg, #856BFF 0%, #7B82FF 100%);
+  box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .2);
+  transition: all .2s;
+  cursor: pointer;
+}
+
+button:hover {
+  box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .3);
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.control {
+  display: flex;
+  align-items: baseline;
+}
+
+.control .refresh {
+  position: relative;
+  top: .1rem;
+  margin-left: 1.5rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.card {
+  margin-right: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  border-radius: 1rem;
+  width: 22rem;
+  background: var(--color-white);
+  box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .04);
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 5rem;
+  height: 5rem;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+}
+
+.gender {
+  margin-right: .75rem;
+  border-radius: .2rem;
+  width: .4rem;
+  height: 1.5rem;
+}
+
+.gender.male {
+  background: var(--color-male);
+}
+
+.gender.female {
+  background: var(--color-female);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: .5rem;
+}
+
+.head > h3 {
+  font-size: 1.5rem;
+}
+
+.body {
+  margin-bottom: 1rem;
+}
+
+.body .contact {
+  margin-bottom: 1rem;
+}
+
+.body .location {
+  line-height: 2;
+}
+
+.map {
+  border-radius: .5rem;
+  width: 100%;
+  height: 10rem;
+  filter: grayscale(60%);
+  overflow: hidden;
+}

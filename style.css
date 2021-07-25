@@ -1,152 +1,223 @@
 :root {
+  --color-calculator: #3A4655;
+  --color-keyboard: #374352;
+  --color-keyboard-hover: #303e4e;
+  --color-danger: #F57E72;
+  --color-result: #9cfae1;
+  --color-text: #dfe4e7;
+  --color-text-dark: #878c94;
+  --color-border: #3f4c5e;
   --color-background: #F3F5FC;
-  --color-white: #FFF;
-  --color-male: #55B9E0;
-  --color-female: #FB7E78;
-  --color-link: #468cce;
-  --color-link-hover: #20609b;
-  --color-text: #2B3747;
-  --color-text-light: #707E92;
 }
 
 * {
+  position: relative;
   margin: 0;
   padding: 0;
+  font-weight: 200;
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  height: 100%;
+  font-size: 62.5%;
+}
+
 body {
-  padding: 4rem 0;
-  font-family: 'Source Sans Pro', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.6rem;
   color: var(--color-text);
   background: var(--color-background);
 }
 
-p {
-  font-size: 1rem;
-  color: var(--color-text-light);
-  line-height: 1.5;
-}
-
-p > span {
-  margin-right: .5rem;
-  font-weight: 700;
-}
-
-a, .control .refresh {
-  color: var(--color-link);
-  text-decoration: none;
-  transition: all .2s;
-}
-
-a:hover, .control .refresh:hover {
-  color: var(--color-link-hover);
-}
-
 button {
-  margin-bottom: 2rem;
   border: 0;
-  border-radius: .75rem;
-  padding: 1rem 1.25rem;
-  font-size: 1rem;
-  color: var(--color-white);
-  background: linear-gradient(90deg, #856BFF 0%, #7B82FF 100%);
-  box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .2);
-  transition: all .2s;
+  font-family: 'Roboto Mono', monospace;
+  outline: none;
   cursor: pointer;
 }
 
-button:hover {
-  box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .3);
-}
-
-.container {
-  margin: 0 auto;
-  max-width: 1200px;
-}
-
-.control {
+#app {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: center;
 }
 
-.control .refresh {
-  position: relative;
-  top: .1rem;
-  margin-left: 1.5rem;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.content {
+.calculator {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.card {
-  margin-right: 1.5rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem 2rem;
-  border-radius: 1rem;
-  width: 22rem;
-  background: var(--color-white);
-  box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .04);
-}
-
-.avatar {
-  border-radius: 50%;
-  width: 5rem;
-  height: 5rem;
+  flex-direction: column;
+  border-radius: .8rem;
+  width: 32rem;
+  height: 56rem;
+  background: var(--color-calculator);
+  box-shadow: 0 2.4rem 4rem .8rem rgba(58, 70, 85, .4);
   overflow: hidden;
 }
 
-.avatar img {
+.title {
+  font-size: 1.3rem;
+  font-weight: 300;
+  text-align: center;
+  margin: .4rem 0;
+  color: var(--color-text);
+}
+
+.view {
+  padding: 0 2rem;
+  height: 14rem;
+}
+.view .formula {
+  margin-top: 2.4rem;
+  font-size: 1.8rem;
+  text-align: right;
+  color: var(--color-text-dark);
+}
+.view .typing {
+  position: absolute;
+  right: 2rem;
+  bottom: 1.6rem;
+  width: calc(100% - 8rem);
+  font-size: 4.8rem;
+  font-weight: 300;
+  text-align: right;
+  color: var(--color-text);
+}
+.view .result {
+  position: absolute;
+  left: 2rem;
+  bottom: 2.4rem;
+  font-size: 1.8rem;
+}
+
+.view .result.hasValue {
+  color: var(--color-result);
+}
+
+.keyboard {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  justify-content: center;
+  flex-grow: 1;
+  background: var(--color-keyboard);
+}
+.keyboard button {
+  border-right: .1rem solid var(--color-border);
+  border-bottom: .1rem solid var(--color-border);
+  font-weight: 300;
+  font-size: 2rem;
+  color: var(--color-text);
+  background: var(--color-keyboard);
+  transition: all .2s;
+}
+.keyboard button:hover {
+  background: var(--color-keyboard-hover);
+}
+.keyboard button.zeroing {
+  color: var(--color-danger);
+}
+.keyboard button.operator {
+  font-size: 3.2rem;
+  color: var(--color-text-dark);
+}
+
+.history {
+  margin-top: 4rem;
+  padding: 7.2rem 1.2rem .4rem 1.6rem;
+  border-radius: .8rem;
+  width: 100%;
+  background: var(--color-calculator);
+  list-style: none;
+}
+
+.history button + li p {
+  color: var(--color-result);
+}
+
+.history li {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: .8rem 0;
+}
+
+.history li p {
+  justify-self: flex-start;
   width: 100%;
 }
 
-.gender {
-  margin-right: .75rem;
-  border-radius: .2rem;
-  width: .4rem;
-  height: 1.5rem;
+.history li span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 1.6rem;
+  width: 3.2rem;
+  height: 3.2rem;
+  font-size: 2rem;
+  color: var(--color-danger);
+  cursor: pointer;
+  transition: all .2s;
+  z-index: 1;
+}
+.history li span:before {
+  content: '';
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  background: var(--color-danger);
+  opacity: .16;
+  transition: all .2s;
+  z-index: -1;
 }
 
-.gender.male {
-  background: var(--color-male);
-}
-
-.gender.female {
-  background: var(--color-female);
-}
-
-.head {
+.history button {
+  position: absolute;
+  top: 1.6rem;
+  right: 1.6rem;
   display: flex;
   align-items: center;
-  margin-top: 1rem;
-  margin-bottom: .5rem;
+  padding: .2rem .8rem;
+  border-radius: .8rem;
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: 2.4;
+  color: var(--color-danger);
+  background: transparent;
+  transition: all .2s;
+  z-index: 1;
 }
-
-.head > h3 {
-  font-size: 1.5rem;
-}
-
-.body {
-  margin-bottom: 1rem;
-}
-
-.body .contact {
-  margin-bottom: 1rem;
-}
-
-.body .location {
-  line-height: 2;
-}
-
-.map {
-  border-radius: .5rem;
+.history button:before {
+  content: '';
+  position: absolute;
+  display: block;
+  margin-left: -.8rem;
+  border-radius: .8rem;
   width: 100%;
-  height: 10rem;
-  filter: grayscale(60%);
-  overflow: hidden;
+  height: 100%;
+  background: var(--color-danger);
+  opacity: .2;
+  transition: all .2s;
+  z-index: -1;
+}
+.history button span {
+  margin-right: .8rem;
+  font-size: 2rem;
+  line-height: 1.43;
+}
+
+.history li span:hover,
+.history button:hover {
+  color: white;
+}
+.history li span:hover:before,
+.history button:hover::before {
+  opacity: 1;
 }
