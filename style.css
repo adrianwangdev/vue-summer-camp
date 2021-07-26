@@ -5,7 +5,7 @@
   --color-danger: #F57E72;
   --color-result: #9cfae1;
   --color-text: #dfe4e7;
-  --color-text-dark: #878c94;
+  --color-text-dark: #a1a8b4;
   --color-border: #3f4c5e;
   --color-background: #F3F5FC;
 }
@@ -41,6 +41,10 @@ button {
   font-family: 'Roboto Mono', monospace;
   outline: none;
   cursor: pointer;
+}
+
+i.fas {
+  opacity: .5;
 }
 
 #app {
@@ -123,7 +127,7 @@ button {
   color: var(--color-danger);
 }
 .keyboard button.operator {
-  font-size: 3.2rem;
+  font-size: 2rem;
   color: var(--color-text-dark);
 }
 

@@ -10,12 +10,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;300&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+    integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
   <!-- Styles -->
   <link rel="stylesheet" href="./style.css">
-  <!-- Axios -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
-    integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -33,19 +32,19 @@
         <button @click="handleClickNumber" type="button">7</button>
         <button @click="handleClickNumber" type="button">8</button>
         <button @click="handleClickNumber" type="button">9</button>
-        <button @click="handleClickOperator" type="button" class="operator">+</button>
+        <button @click="handleClickOperator('+')" type="button" class="operator"><i class="fas fa-plus"></i></button>
         <button @click="handleClickNumber" type="button">4</button>
         <button @click="handleClickNumber" type="button">5</button>
         <button @click="handleClickNumber" type="button">6</button>
-        <button @click="handleClickOperator" type="button" class="operator">-</button>
+        <button @click="handleClickOperator('-')" type="button" class="operator"><i class="fas fa-minus"></i></button>
         <button @click="handleClickNumber" type="button">1</button>
         <button @click="handleClickNumber" type="button">2</button>
         <button @click="handleClickNumber" type="button">3</button>
-        <button @click="handleClickOperator" type="button" class="operator">x</button>
+        <button @click="handleClickOperator('*')" type="button" class="operator"><i class="fas fa-times"></i></button>
         <button @click="handleClickReset" type="button" class="zeroing">C</button>
         <button @click="handleClickNumber" type="button">0</button>
-        <button @click="handleClickEqual" type="button" class="operator">=</button>
-        <button @click="handleClickOperator" type="button" class="operator">/</button>
+        <button @click="handleClickEqual" type="button" class="operator"><i class="fas fa-equals"></i></button>
+        <button @click="handleClickOperator('/')" type="button" class="operator"><i class="fas fa-divide"></i></button>
       </div>
     </div>
 
@@ -77,25 +76,6 @@
           formulaList: [],
         });
 
-        const setComputeFormula = (operator) => {
-          switch (operator) {
-            case '+':
-              data.computeFormula = (prev, typing) => prev + typing;
-              break;
-            case '-':
-              data.computeFormula = (prev, typing) => prev - typing;
-              break;
-            case 'x':
-              data.computeFormula = (prev, typing) => prev * typing;
-              break;
-            case '/':
-              data.computeFormula = (prev, typing) => prev / typing;
-              break;
-            default:
-              break;
-          }
-        };
-
         const computeResult = () => {
           let result = data.computeFormula(
             parseFloat(data.previous, 10),
@@ -105,6 +85,10 @@
           result.toString().indexOf('.') !== -1 && (result = result.toFixed(1));
           return result;
         };
+
+        const setComputeFormula = (operator) => (
+          eval(`(prev, typing) => prev ${operator} typing`)
+        );
 
         const handleClickNumber = (event) => {
           if (data.clickEqual) {
@@ -121,8 +105,7 @@
           data.typing += value;
         };
 
-        const handleClickOperator = (event) => {
-          const operator = event.target.innerText;
+        const handleClickOperator = (operator) => {
           if (data.clickEqual) return;
           if (!data.clickOperator) {
             // 顯示公式
@@ -131,7 +114,7 @@
             // 計算邏輯
             data.clickOperator = true;
             data.computeFormula && (data.result = computeResult());
-            setComputeFormula(operator);
+            data.computeFormula = setComputeFormula(operator);
             !data.result ? (data.previous = data.typing) : (data.previous = data.result);
             data.typing = '';
           } else {
@@ -141,7 +124,7 @@
             data.displayFormula = newDisplayFormula.join('');
 
             // 計算邏輯
-            setComputeFormula(operator);
+            data.computeFormula = setComputeFormula(operator);
           }
         };
 
@@ -184,9 +167,11 @@
           data.formulaList = data.formulaList.filter((item) => item.id !== id);
         };
 
-        watch(() => JSON.stringify(data.formulaList), () => {
-          localStorage.setItem('formulaList', JSON.stringify(data.formulaList));
-        });
+        watch(
+          () => data.formulaList,
+          () => localStorage.setItem('formulaList', JSON.stringify(data.formulaList)),
+          { deep: true },
+        );
 
         onMounted(() => {
           if (localStorage.getItem('formulaList')) {
