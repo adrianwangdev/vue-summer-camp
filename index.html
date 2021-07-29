@@ -29,17 +29,32 @@
 
     <ul v-if="state.todos.length > 0" class="todos">
       <li class="toolbar">
-        <button v-if="state.showCompletedAllButton" @click="handleTodos('completed')" class="completedAll">Completed
-          All</button>
+        <button
+          v-if="state.showCompletedAllButton"
+          @click="handleTodos('completed')"
+          class="completedAll"
+        >
+          Completed All
+        </button>
         <button @click="handleTodos('delete')" class="deleteAll">Delete All</button>
       </li>
 
-      <li v-for="{ id, value, completed, editing } in filterTodos" :key="id" :class="{'completed': completed}"
-        @click="completedTodo($event, id)" @dblclick="editTodo(id)">
+      <li
+        v-for="{ id, value, completed, editing } in filterTodos"
+        :key="id"
+        :class="{'completed': completed}"
+        @click="completedTodo($event, id)"
+        @dblclick="editTodo(id)"
+      >
         <i v-if="completed" data-feather="check-circle"></i>
         <i v-else data-feather="circle"></i>
-        <input v-if="editing" v-model="value" @blur="cancelEdit(id)" @keyup.enter="confirmEdit($event, id)"
-          type="text" />
+        <input
+          v-if="editing"
+          v-model="value"
+          @blur="cancelEdit(id)"
+          @keyup.enter="confirmEdit($event, id)"
+          type="text"
+        />
         <p v-else>{{ value }}</p>
         <span v-if="editing" class="helperText">Please press 'Enter' to confirm</span>
         <div v-else class="iconButton" @click="deleteTodo(id)">
