@@ -5,190 +5,170 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vue - Summer camp homework 02</title>
+  <title>Vue - Summer camp homework 03</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;300&display=swap" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
-    integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
   <!-- Styles -->
   <link rel="stylesheet" href="./style.css">
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 
 <body>
   <div id="app">
-    <div class="calculator">
-      <h1 class="title">Calculator</h1>
+    <h1 class="title">Todo List</h1>
 
-      <div class="view">
-        <p class="formula">{{ data.displayFormula }}</p>
-        <p class="typing">{{ data.typing }}</p>
-        <p class="result" :class="{'hasValue': data.result}">= {{ data.result || 0 }}</p>
-      </div>
-
-      <div class="keyboard">
-        <button @click="handleClickNumber" type="button">7</button>
-        <button @click="handleClickNumber" type="button">8</button>
-        <button @click="handleClickNumber" type="button">9</button>
-        <button @click="handleClickOperator('+')" type="button" class="operator"><i class="fas fa-plus"></i></button>
-        <button @click="handleClickNumber" type="button">4</button>
-        <button @click="handleClickNumber" type="button">5</button>
-        <button @click="handleClickNumber" type="button">6</button>
-        <button @click="handleClickOperator('-')" type="button" class="operator"><i class="fas fa-minus"></i></button>
-        <button @click="handleClickNumber" type="button">1</button>
-        <button @click="handleClickNumber" type="button">2</button>
-        <button @click="handleClickNumber" type="button">3</button>
-        <button @click="handleClickOperator('*')" type="button" class="operator"><i class="fas fa-times"></i></button>
-        <button @click="handleClickReset" type="button" class="zeroing">C</button>
-        <button @click="handleClickNumber" type="button">0</button>
-        <button @click="handleClickEqual" type="button" class="operator"><i class="fas fa-equals"></i></button>
-        <button @click="handleClickOperator('/')" type="button" class="operator"><i class="fas fa-divide"></i></button>
-      </div>
+    <div class="addTodo">
+      <input v-model="state.todoText" @keyup.enter="addTodo" type="text" />
+      <button @click="addTodo">
+        <i data-feather="plus"></i>
+      </button>
     </div>
 
-    <ul v-if="data.formulaList.length > 0" class="history">
-      <button @click="handleClickHistories" type="button">
-        <span>🗑</span>
-        Delete All
-      </button>
-      <li v-for="{ id, title } in data.formulaList" :key="id">
-        <p>{{ title }}</p>
-        <span @click="handleDeleteHistoryItem(id)">🗑</span>
+    <ul v-if="state.todos.length > 0" class="todos">
+      <li class="toolbar">
+        <button v-if="state.showCompletedAllButton" @click="handleTodos('completed')" class="completedAll">Completed
+          All</button>
+        <button @click="handleTodos('delete')" class="deleteAll">Delete All</button>
+      </li>
+
+      <li v-for="{ id, value, completed, editing } in filterTodos" :key="id" :class="{'completed': completed}"
+        @click="completedTodo($event, id)" @dblclick="editTodo(id)">
+        <i v-if="completed" data-feather="check-circle"></i>
+        <i v-else data-feather="circle"></i>
+        <input v-if="editing" v-model="value" @blur="cancelEdit(id)" @keyup.enter="confirmEdit($event, id)"
+          type="text" />
+        <p v-else>{{ value }}</p>
+        <span v-if="editing" class="helperText">Please press 'Enter' to confirm</span>
+        <div v-else class="iconButton" @click="deleteTodo(id)">
+          <i data-feather="trash-2"></i>
+        </div>
+      </li>
+
+      <li class="footer">
+        <p>{{ filterTodos.length }} items</p>
+        <select v-model="state.filter">
+          <option value="all">All</option>
+          <option value="todo">Todo</option>
+          <option value="completed">Completed</option>
+        </select>
       </li>
     </ul>
   </div>
 
+  <script>
+    /* ===== Feather Icons ===== */
+    feather.replace()
+  </script>
+
   <script type="module">
-    import { createApp, reactive, watch, onMounted } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.0-beta.4/vue.esm-browser.min.js';
+    /* ========== Vue ========== */
+    import { createApp, reactive, watch, computed, onMounted } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.0-beta.4/vue.esm-browser.min.js';
 
     createApp({
       setup() {
-        const data = reactive({
-          displayFormula: '',
-          computeFormula: null,
-          previous: '0',
-          typing: '',
-          result: '',
-          clickEqual: true,
-          clickOperator: false,
-          formulaList: [],
+        const state = reactive({
+          todoText: '',
+          todos: [],
+          filter: 'all',
+          completed: true,
+          editing: false,
+          showCompletedAllButton: true,
         });
 
-        const computeResult = () => {
-          let result = data.computeFormula(
-            parseFloat(data.previous, 10),
-            parseFloat(data.typing, 10),
-          );
-
-          result.toString().indexOf('.') !== -1 && (result = result.toFixed(1));
-          return result;
-        };
-
-        const setComputeFormula = (operator) => (
-          eval(`(prev, typing) => prev ${operator} typing`)
-        );
-
-        const handleClickNumber = (event) => {
-          if (data.clickEqual) {
-            data.result = '';
-            data.computeFormula = null;
-            data.clickEqual = false;
+        const filterTodos = computed(() => {
+          switch (state.filter) {
+            case 'todo':
+              return state.todos.filter((item) => !item.completed);
+            case 'completed':
+              return state.todos.filter((item) => item.completed);
+            default:
+              return state.todos;
           }
-          // 顯示公式
-          const value = event.target.innerText;
-          data.displayFormula += value;
+        });
 
-          // 計算邏輯
-          data.clickOperator = false;
-          data.typing += value;
+        const getTodoItem = (todoId) => {
+          const index = state.todos.findIndex((todo) => todo.id === todoId);
+          return state.todos[index];
         };
 
-        const handleClickOperator = (operator) => {
-          if (data.clickEqual) return;
-          if (!data.clickOperator) {
-            // 顯示公式
-            data.displayFormula += ` ${operator} `;
+        const addTodo = (event) => {
+          state.todos.unshift({
+            id: Date.now(),
+            value: state.todoText,
+            completed: false,
+            editing: false,
+          })
+          state.todoText = '';
+        };
 
-            // 計算邏輯
-            data.clickOperator = true;
-            data.computeFormula && (data.result = computeResult());
-            data.computeFormula = setComputeFormula(operator);
-            !data.result ? (data.previous = data.typing) : (data.previous = data.result);
-            data.typing = '';
+        const completedTodo = (event, id) => {
+          const todo = getTodoItem(id);
+          if (todo && event.target.nodeName !== "INPUT") {
+            todo.completed = !todo.completed;
+          }
+        };
+
+        const editTodo = (id) => {
+          const todo = getTodoItem(id);
+          todo.editing = true;
+        };
+
+        const cancelEdit = (id) => {
+          const todo = getTodoItem(id);
+          todo.editing = false;
+        };
+
+        const confirmEdit = (event, id) => {
+          const todo = getTodoItem(id);
+          todo.value = event.target.value;
+          todo.editing = false;
+        };
+
+        const deleteTodo = (id) => {
+          state.todos = state.todos.filter((todo) => todo.id !== id);
+        };
+
+        const handleTodos = (type) => {
+          if (type === 'completed') {
+            state.todos.forEach((todo) => todo.completed = true);
           } else {
-            // 顯示公式
-            const newDisplayFormula = data.displayFormula.split('');
-            newDisplayFormula.splice(newDisplayFormula.length - 2, 1, operator);
-            data.displayFormula = newDisplayFormula.join('');
-
-            // 計算邏輯
-            data.computeFormula = setComputeFormula(operator);
+            const warning = window.confirm('Are you sure you want to delete all todos ?');
+            if (warning) state.todos = [];
           }
-        };
-
-        const handleClickEqual = () => {
-          if (data.clickEqual) return;
-          if (!data.computeFormula && data.typing) {
-            data.result = data.typing;
-          } else if (data.computeFormula && !data.typing) {
-            data.result = data.previous;
-          } else {
-            data.result = computeResult();
-            data.formulaList.length === 10 && data.formulaList.pop();
-            data.formulaList.unshift({
-              id: Date.now(),
-              title: `${data.displayFormula} = ${data.result}`,
-            });
-          }
-          data.clickEqual = true;
-          data.previous = '0';
-          data.typing = '';
-          data.displayFormula = '';
-        };
-
-        const handleClickReset = () => {
-          data.displayFormula = '';
-          data.computeFormula = null;
-          data.previous = '0';
-          data.typing = '';
-          data.result = '';
-          data.clickEqual = true;
-          data.clickOperator = false;
-        };
-
-        const handleClickHistories = () => {
-          data.formulaList = [];
-          handleClickReset();
-        };
-
-        const handleDeleteHistoryItem = (id) => {
-          data.formulaList = data.formulaList.filter((item) => item.id !== id);
         };
 
         watch(
-          () => data.formulaList,
-          () => localStorage.setItem('formulaList', JSON.stringify(data.formulaList)),
+          () => state.todos,
+          () => {
+            localStorage.setItem('todos', JSON.stringify(state.todos));
+            state.showCompletedAllButton = (
+              !state.todos.every((todo) => todo.completed)
+            );
+          },
           { deep: true },
         );
 
         onMounted(() => {
-          if (localStorage.getItem('formulaList')) {
-            data.formulaList = JSON.parse(localStorage.getItem('formulaList'));
-          };
+          if (localStorage.getItem('todos')) {
+            state.todos = JSON.parse(localStorage.getItem('todos'));
+          }
         });
 
         return {
-          data,
-          handleClickNumber,
-          handleClickOperator,
-          handleClickEqual,
-          handleClickReset,
-          handleClickHistories,
-          handleDeleteHistoryItem,
+          state,
+          addTodo,
+          completedTodo,
+          editTodo,
+          cancelEdit,
+          confirmEdit,
+          deleteTodo,
+          handleTodos,
+          filterTodos,
         };
-      },
+      }
     }).mount('#app');
   </script>
 </body>

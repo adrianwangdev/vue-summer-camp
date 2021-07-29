@@ -1,19 +1,22 @@
 :root {
-  --color-calculator: #3A4655;
-  --color-keyboard: #374352;
-  --color-keyboard-hover: #303e4e;
-  --color-danger: #F57E72;
-  --color-result: #9cfae1;
-  --color-text: #dfe4e7;
-  --color-text-dark: #a1a8b4;
-  --color-border: #3f4c5e;
-  --color-background: #F3F5FC;
+  --color-primary: #fcd79f;
+  --color-primary-gradient: linear-gradient(45deg, #e9677c  0%,#fcd79f 100%);
+  --color-text: #d5d5dd;
+  --color-text-dark: #696781;
+  --color-body: #363C61;
+  --color-body-hover: rgba(0, 0, 0, .08);
+  --color-select-background: rgba(255, 255, 255, .08);
+  --color-background: #191C35;
+  --color-border: rgba(255, 255, 255, .24);
+  --color-safe: #9cfae1;
+  --color-danger: #ff8a8a;
 }
 
 * {
   position: relative;
   margin: 0;
   padding: 0;
+  font-family: 'Noto Sans TC', sans-serif;
   font-weight: 200;
   box-sizing: border-box;
 }
@@ -30,198 +33,216 @@ body {
   align-items: center;
   width: 100%;
   height: 100%;
-  font-family: 'Roboto Mono', monospace;
   font-size: 1.6rem;
   color: var(--color-text);
   background: var(--color-background);
 }
 
-button {
+#app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 28.8rem;
+  width: 64%;
+  height: 100%;
+}
+
+input {
+  flex-grow: 1;
+  padding: 0 1.6rem;
   border: 0;
-  font-family: 'Roboto Mono', monospace;
+  color: var(--color-text);
+  outline: none;
+  caret-color: var(--color-primary);
+}
+
+select {
+  padding: 0 .4rem;
+  border: 0;
+  border-radius: .8rem;
+  height: 4rem;
+  width: 12rem;
+  letter-spacing: .08rem;
+  color: var(--color-text);
+  background: var(--color-select-background);
   outline: none;
   cursor: pointer;
 }
 
-i.fas {
-  opacity: .5;
+option {
+  color: var(--color-text);
+  background: var(--color-body);
 }
 
-#app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.calculator {
-  display: flex;
-  flex-direction: column;
+button {
+  border: 0;
   border-radius: .8rem;
-  width: 32rem;
-  height: 56rem;
-  background: var(--color-calculator);
-  box-shadow: 0 2.4rem 4rem .8rem rgba(58, 70, 85, .4);
-  overflow: hidden;
-}
-
-.title {
-  font-size: 1.3rem;
-  font-weight: 300;
-  text-align: center;
-  margin: .4rem 0;
-  color: var(--color-text);
-}
-
-.view {
-  padding: 0 2rem;
-  height: 14rem;
-}
-.view .formula {
-  margin-top: 2.4rem;
-  font-size: 1.8rem;
-  text-align: right;
-  color: var(--color-text-dark);
-}
-.view .typing {
-  position: absolute;
-  right: 2rem;
-  bottom: 1.6rem;
-  width: calc(100% - 8rem);
-  font-size: 4.8rem;
-  font-weight: 300;
-  text-align: right;
-  color: var(--color-text);
-}
-.view .result {
-  position: absolute;
-  left: 2rem;
-  bottom: 2.4rem;
-  font-size: 1.8rem;
-}
-
-.view .result.hasValue {
-  color: var(--color-result);
-}
-
-.keyboard {
-  display: grid;
-  grid-template-rows: repeat(4, 1fr);
-  grid-template-columns: repeat(4, 1fr);
-  justify-content: center;
-  flex-grow: 1;
-  background: var(--color-keyboard);
-}
-.keyboard button {
-  border-right: .1rem solid var(--color-border);
-  border-bottom: .1rem solid var(--color-border);
-  font-weight: 300;
-  font-size: 2rem;
-  color: var(--color-text);
-  background: var(--color-keyboard);
+  padding: 0 1.2rem;
+  letter-spacing: .08rem;
+  height: 4rem;
+  outline: none;
+  cursor: pointer;
   transition: all .2s;
 }
-.keyboard button:hover {
-  background: var(--color-keyboard-hover);
-}
-.keyboard button.zeroing {
-  color: var(--color-danger);
-}
-.keyboard button.operator {
-  font-size: 2rem;
-  color: var(--color-text-dark);
-}
 
-.history {
-  margin-top: 4rem;
-  padding: 7.2rem 1.2rem .4rem 1.6rem;
-  border-radius: .8rem;
-  width: 100%;
-  background: var(--color-calculator);
+ul {
   list-style: none;
 }
 
-.history button + li p {
-  color: var(--color-result);
+.feather {
+  width: 2.4rem;
+  height: 2.4rem;
 }
 
-.history li {
+.title {
+  margin-bottom: 4rem;
+  font-weight: bold;
+  letter-spacing: .16rem;
+  color: var(--color-primary);
+}
+
+.addTodo {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: .8rem 0;
-}
-
-.history li p {
-  justify-self: flex-start;
+  margin-bottom: 4rem;
   width: 100%;
 }
 
-.history li span {
+.addTodo input {
+  border-radius: .8rem;
+  font-size: 2rem;
+  letter-spacing: .2rem;
+  background: var(--color-body);
+  box-shadow: 0 0 2rem rgb(245, 175, 142, .12);
+}
+
+.addTodo button {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 1.6rem;
-  width: 3.2rem;
-  height: 3.2rem;
-  font-size: 2rem;
-  color: var(--color-danger);
-  cursor: pointer;
-  transition: all .2s;
-  z-index: 1;
-}
-.history li span:before {
-  content: '';
-  position: absolute;
-  display: block;
+  margin-left: 2.4rem;
   border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  background: var(--color-danger);
-  opacity: .16;
-  transition: all .2s;
-  z-index: -1;
+  min-width: 5.6rem;
+  min-height: 5.6rem;
+  font-size: 1.8rem;
+  color: white;
+  background: var(--color-primary-gradient);
+  box-shadow: 0 0 2rem rgb(245, 175, 142, .5);
+  transition: all .4s;
 }
 
-.history button {
-  position: absolute;
-  top: 1.6rem;
-  right: 1.6rem;
+.addTodo button:hover {
+  box-shadow: 0 0 2.8rem rgb(245, 175, 142, .2);
+  transform: scale(1.1);
+}
+
+.todos {
+  width: 100%;
+  border-radius: .8rem;
+  background: var(--color-body);
+  box-shadow: 0 0 2rem rgb(245, 175, 142, .12);
+}
+
+.todos li {
   display: flex;
   align-items: center;
-  padding: .2rem .8rem;
-  border-radius: .8rem;
-  font-size: 1.4rem;
-  font-weight: 300;
-  line-height: 2.4;
-  color: var(--color-danger);
-  background: transparent;
+  padding: 2rem 7.8rem 2rem 2rem;
+  border-bottom: .1rem solid var(--color-border);
   transition: all .2s;
-  z-index: 1;
-}
-.history button:before {
-  content: '';
-  position: absolute;
-  display: block;
-  margin-left: -.8rem;
-  border-radius: .8rem;
-  width: 100%;
-  height: 100%;
-  background: var(--color-danger);
-  opacity: .2;
-  transition: all .2s;
-  z-index: -1;
-}
-.history button span {
-  margin-right: .8rem;
-  font-size: 2rem;
-  line-height: 1.43;
+  cursor: pointer;
 }
 
-.history li span:hover,
-.history button:hover {
-  color: white;
+.todos li:last-child {
+  border: 0;
 }
-.history li span:hover:before,
-.history button:hover::before {
-  opacity: 1;
+
+.todos li.completed {
+  color: var(--color-text-dark);
+}
+
+.todos li.completed .iconButton {
+  opacity: .4;
+}
+
+.todos li.toolbar,
+.todos li.footer {
+  display: flex;
+  padding: 1.2rem 2rem;
+  cursor: default;
+}
+
+.todos li.toolbar:hover,
+.todos li.footer:hover {
+  background: unset;
+}
+
+.todos li.toolbar {
+  justify-content: flex-end;
+}
+
+.todos li.toolbar button.completedAll {
+  margin-right: 1.6rem;
+  border: .1rem solid var(--color-safe);
+  color: var(--color-safe);
+  background: transparent;
+}
+
+.todos li.toolbar button.completedAll:hover {
+  color: var(--color-background);
+  background: var(--color-safe);
+}
+
+.todos li.toolbar button.deleteAll {
+  border: .1rem solid var(--color-danger);
+  color: var(--color-danger);
+  background: transparent;
+}
+
+.todos li.toolbar button.deleteAll:hover {
+  color: var(--color-background);
+  background: var(--color-danger);
+}
+
+.todos li.footer {
+  justify-content: space-between;
+}
+
+.todos li.footer p {
+  margin-left: 0;
+}
+
+.todos li p {
+  margin-left: 2rem;
+}
+
+.todos li input {
+  margin-left: 2rem;
+  padding-left: 0;
+  font-size: 1.6rem;
+  color: inherit;
+  background: transparent;
+}
+
+.iconButton {
+  position: absolute;
+  top: 50%;
+  right: 1.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 4.8rem;
+  height: 4.8rem;
+  color: var(--color-danger);
+  transform: translateY(-50%);
+  transition: all .2s;
+}
+
+.helperText {
+  position: absolute;
+  right: 2rem;
+  font-size: 1.2rem;
+  letter-spacing: .08rem;
+  color: var(--color-primary);
+  opacity: .8;
 }
