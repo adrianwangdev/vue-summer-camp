@@ -152,6 +152,10 @@ ul {
   cursor: pointer;
 }
 
+.todos li:hover {
+  background: var(--color-body-hover);
+}
+
 .todos li:last-child {
   border: 0;
 }
@@ -236,6 +240,10 @@ ul {
   color: var(--color-danger);
   transform: translateY(-50%);
   transition: all .2s;
+}
+
+.iconButton:hover {
+  background: var(--color-select-background);
 }
 
 .helperText {
